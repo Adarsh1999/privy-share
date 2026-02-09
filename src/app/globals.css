@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f8fb;
+  --foreground: #102538;
+  --surface: #ffffff;
+  --surface-soft: #f8fbff;
+  --accent: #0c6fa6;
+  --accent-strong: #084d73;
+  --muted: #617285;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-plex-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(248, 201, 119, 0.24), transparent 42%),
+    radial-gradient(circle at 85% 12%, rgba(61, 165, 224, 0.2), transparent 42%),
+    linear-gradient(145deg, #eef6fd 0%, #fbf7ef 48%, #edf8f8 100%);
+  font-family: var(--font-space-grotesk), sans-serif;
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  border-radius: 9999px;
+  filter: blur(48px);
+  pointer-events: none;
+}
+
+body::before {
+  width: 340px;
+  height: 340px;
+  right: -90px;
+  bottom: -110px;
+  background: rgba(30, 135, 196, 0.22);
+  animation: drift-one 14s ease-in-out infinite;
+}
+
+body::after {
+  width: 300px;
+  height: 300px;
+  left: -90px;
+  top: -100px;
+  background: rgba(248, 184, 80, 0.2);
+  animation: drift-two 12s ease-in-out infinite;
+}
+
+code,
+pre {
+  font-family: var(--font-plex-mono), monospace;
+}
+
+@keyframes drift-one {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-16px, 12px, 0);
+  }
+}
+
+@keyframes drift-two {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(12px, -14px, 0);
+  }
 }

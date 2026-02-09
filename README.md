@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Privy Share
 
-## Getting Started
+Privy Share is a personal, no-username vault for quick public-computer access.
 
-First, run the development server:
+- Unlock uses a 6-digit TOTP code from Microsoft Authenticator.
+- After 10 wrong codes in a row, login is locked for 30 minutes.
+- Text, links, and metadata are stored in Azure Table Storage.
+- Files/images are stored in a private Azure Blob container.
+
+## Stack
+
+- Next.js (App Router, TypeScript)
+- Azure Blob Storage (`@azure/storage-blob`)
+- Azure Table Storage (`@azure/data-tables`)
+- TOTP (`otplib`)
+- Signed session cookie (`jose`)
+
+## Local setup
+
+1. Install deps:
+
+```bash
+npm install
+```
+
+2. Generate secrets (recommended):
+
+```bash
+node scripts/generate-secrets.mjs
+```
+
+3. Create `.env.local` from `.env.example` and fill values.
+
+4. Run dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Azure provisioning + deploy
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This script provisions everything and deploys the app:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Resource Group
+- Storage Account + private blob container
+- Table Storage tables (`PrivyItems`, `PrivyAuth`)
+- Linux App Service plan + Web App
+- App settings (including TOTP/session secrets)
 
-## Learn More
+```bash
+TOTP_SECRET_BASE32="<from generator>" \
+SESSION_SECRET="<from generator>" \
+TOTP_ACCOUNT_NAME="your-name" \
+./scripts/provision-and-deploy-azure.sh
+```
 
-To learn more about Next.js, take a look at the following resources:
+Optional env overrides for script:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `RESOURCE_GROUP`, `LOCATION`, `SKU`
+- `STORAGE_ACCOUNT`, `WEBAPP_NAME`, `APP_SERVICE_PLAN`
+- `AUTH_MAX_ATTEMPTS`, `AUTH_LOCK_MINUTES`, `MAX_UPLOAD_MB`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Authenticator enrollment
 
-## Deploy on Vercel
+Use the script output values in Microsoft Authenticator:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Add account
+2. Choose `Other account` (TOTP)
+3. Enter issuer/account/secret manually
+4. Use generated 6-digit codes to unlock Privy Share
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Security notes
+
+- Sessions are HTTP-only signed cookies.
+- Blob container is private; downloads use short-lived SAS URLs.
+- No Outlook/password sign-in is required for the app.
+- Keep `TOTP_SECRET_BASE32` and `SESSION_SECRET` private.
