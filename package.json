@@ -1,5 +1,6 @@
 {
   "name": "privy-share",
+  "description": "Secure, TOTP-protected personal vault for sharing text, links, files, and images on public computers using Next.js and Azure storage.",
   "version": "0.1.0",
   "private": true,
   "scripts": {

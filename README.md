@@ -1,6 +1,6 @@
 # Privy Share
 
-Privy Share is a personal vault for accessing text, links, files, and images on public computers without logging into personal accounts.
+Privy Share is a secure, TOTP-protected personal vault built with Next.js and Azure storage for accessing text, links, files, and images on public computers without logging into personal accounts.
 
 Access is protected by a TOTP code (Microsoft Authenticator or any compatible app), not email/password login.
 
